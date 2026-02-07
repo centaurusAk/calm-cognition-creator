@@ -1,0 +1,150 @@
+import { motion } from 'framer-motion';
+import { Clock, BookOpen, FlaskConical, FileText, Pencil, AlertCircle } from 'lucide-react';
+import { Task } from '@/types/dashboard';
+import { format, isToday, isTomorrow, formatDistanceToNow } from 'date-fns';
+import { cn } from '@/lib/utils';
+
+const typeIcons = {
+  quiz: BookOpen,
+  assignment: Pencil,
+  project: FileText,
+  reading: BookOpen,
+  lab: FlaskConical,
+};
+
+const priorityStyles = {
+  high: 'border-l-critical bg-critical-soft/30',
+  medium: 'border-l-urgency bg-urgency-soft/30',
+  low: 'border-l-accent bg-accent-soft/30',
+};
+
+interface TaskCardProps {
+  task: Task;
+  index: number;
+  compact?: boolean;
+}
+
+export function TaskCard({ task, index, compact = false }: TaskCardProps) {
+  const Icon = typeIcons[task.type];
+  
+  const formatDueDate = () => {
+    if (isToday(task.dueDate)) {
+      return `Today, ${format(task.dueDate, 'h:mm a')}`;
+    }
+    if (isTomorrow(task.dueDate)) {
+      return `Tomorrow, ${format(task.dueDate, 'h:mm a')}`;
+    }
+    return format(task.dueDate, 'EEE, MMM d');
+  };
+
+  const isUrgent = task.priority === 'high' && isToday(task.dueDate);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ 
+        duration: 0.3, 
+        delay: index * 0.05,
+        ease: [0.25, 0.46, 0.45, 0.94]
+      }}
+      whileHover={{ 
+        scale: 1.01, 
+        transition: { duration: 0.2 } 
+      }}
+      className={cn(
+        'group relative rounded-xl border-l-4 p-4 transition-all duration-300',
+        'bg-card hover:shadow-lg cursor-pointer',
+        priorityStyles[task.priority],
+        compact && 'p-3'
+      )}
+    >
+      {isUrgent && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute -top-2 -right-2 flex items-center gap-1 rounded-full bg-critical px-2 py-1 text-xs font-medium text-critical-foreground"
+        >
+          <AlertCircle className="h-3 w-3" />
+          Urgent
+        </motion.div>
+      )}
+      
+      <div className="flex items-start gap-3">
+        <motion.div 
+          className={cn(
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg',
+            'bg-primary/10 text-primary',
+            compact && 'h-8 w-8'
+          )}
+          whileHover={{ rotate: 5 }}
+        >
+          <Icon className={cn('h-5 w-5', compact && 'h-4 w-4')} />
+        </motion.div>
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <h3 className={cn(
+                'font-medium text-foreground truncate',
+                compact ? 'text-sm' : 'text-base'
+              )}>
+                {task.title}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {task.course}
+              </p>
+            </div>
+          </div>
+          
+          <div className={cn(
+            'flex items-center gap-4 text-xs text-muted-foreground',
+            compact ? 'mt-2' : 'mt-3'
+          )}>
+            <span className={cn(
+              'flex items-center gap-1',
+              isUrgent && 'text-critical font-medium'
+            )}>
+              <Clock className="h-3.5 w-3.5" />
+              {formatDueDate()}
+            </span>
+            <span className="flex items-center gap-1">
+              <motion.div 
+                className="h-1.5 w-1.5 rounded-full bg-muted-foreground"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ repeat: Infinity, duration: 2 }}
+              />
+              {task.estimatedTime} min
+            </span>
+          </div>
+        </div>
+
+        {task.status === 'in-progress' && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="shrink-0"
+          >
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+              <motion.span 
+                className="h-1.5 w-1.5 rounded-full bg-primary"
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+              />
+              In Progress
+            </span>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Hover glow effect */}
+      <motion.div
+        className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{
+          background: 'radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), hsl(var(--primary) / 0.06), transparent 40%)',
+        }}
+      />
+    </motion.div>
+  );
+}
