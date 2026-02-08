@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Clock, Target, Sparkles, Calendar } from 'lucide-react';
+import { ChevronDown, Clock, Target, Sparkles, Calendar, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Task } from '@/types/dashboard';
 import { TaskCard } from './TaskCard';
+import { AddTaskDialog } from './AddTaskDialog';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -61,6 +62,22 @@ export function TodayWidget({ tasks, totalTime }: TodayWidgetProps) {
           >
             <Sparkles className="h-4 w-4" />
             {tasks.filter(t => t.priority === 'high').length} urgent
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.35 }}
+          >
+            <AddTaskDialog 
+              variant="inline"
+              trigger={
+                <Button variant="default" size="sm" className="rounded-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Task
+                </Button>
+              }
+            />
           </motion.div>
           
           <motion.div

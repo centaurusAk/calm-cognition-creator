@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion';
-import { Bell, Settings, Sun, Moon, Sparkles } from 'lucide-react';
+import { Bell, Settings, Sun, Moon, Sparkles, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-
+import { AddTaskDialog } from './AddTaskDialog';
 interface HeaderProps {
   focusMode: boolean;
   onToggleDarkMode?: () => void;
@@ -58,12 +58,26 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
               )}>
                 {greeting}
               </h1>
-              <p className={cn(
-                'text-sm',
-                focusMode ? 'text-focus-foreground/60' : 'text-muted-foreground'
-              )}>
-                {format(now, 'EEEE, MMMM d')}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className={cn(
+                  'text-sm',
+                  focusMode ? 'text-focus-foreground/60' : 'text-muted-foreground'
+                )}>
+                  {format(now, 'EEEE, MMMM d')}
+                </p>
+                {!focusMode && (
+                  <AddTaskDialog 
+                    variant="inline"
+                    trigger={
+                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <Button variant="ghost" size="sm" className="h-7 px-2 text-muted-foreground hover:text-foreground">
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </motion.div>
+                    }
+                  />
+                )}
+              </div>
             </div>
           </div>
 

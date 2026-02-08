@@ -47,9 +47,11 @@ const courseOptions = [
 
 interface AddTaskDialogProps {
   onTaskAdd?: (task: any) => void;
+  trigger?: React.ReactNode;
+  variant?: 'fab' | 'inline';
 }
 
-export function AddTaskDialog({ onTaskAdd }: AddTaskDialogProps) {
+export function AddTaskDialog({ onTaskAdd, trigger, variant = 'fab' }: AddTaskDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -111,20 +113,29 @@ export function AddTaskDialog({ onTaskAdd }: AddTaskDialogProps) {
     setOpen(false);
   };
 
+  const defaultTrigger = variant === 'fab' ? (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+    >
+      <Button
+        size="lg"
+        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 z-50"
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
+    </motion.div>
+  ) : (
+    <Button variant="outline" size="sm" className="rounded-full">
+      <Plus className="h-4 w-4 mr-2" />
+      Add Task
+    </Button>
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button
-            size="lg"
-            className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 z-50"
-          >
-            <Plus className="h-6 w-6" />
-          </Button>
-        </motion.div>
+        {trigger || defaultTrigger}
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
