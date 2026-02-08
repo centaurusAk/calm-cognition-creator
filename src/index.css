@@ -91,80 +91,80 @@
   }
 
   .dark, .focus-mode {
-    /* Rich charcoal with green undertone - completely different feel */
-    --background: 160 15% 6%;
-    --foreground: 60 30% 96%;
+    /* Pure dark slate - clean and readable */
+    --background: 220 15% 8%;
+    --foreground: 0 0% 98%;
 
-    /* Cards with forest-tinted depth */
-    --card: 160 12% 10%;
-    --card-foreground: 60 25% 94%;
-    --card-elevated: 160 10% 14%;
+    /* Clean dark cards with good separation */
+    --card: 220 15% 12%;
+    --card-foreground: 0 0% 96%;
+    --card-elevated: 220 14% 16%;
 
-    --popover: 160 12% 12%;
-    --popover-foreground: 60 25% 94%;
+    --popover: 220 15% 14%;
+    --popover-foreground: 0 0% 96%;
 
-    /* Mint-green primary - fresh and calming */
-    --primary: 160 70% 50%;
-    --primary-foreground: 160 15% 6%;
-    --primary-soft: 160 40% 15%;
+    /* Bright blue primary - pops on dark */
+    --primary: 220 90% 56%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 220 60% 20%;
 
-    /* Earthy warm secondary */
-    --secondary: 30 15% 15%;
-    --secondary-foreground: 60 20% 90%;
+    /* Neutral dark secondary */
+    --secondary: 220 12% 18%;
+    --secondary-foreground: 0 0% 92%;
 
-    /* Muted sage tones */
-    --muted: 160 8% 18%;
-    --muted-foreground: 60 10% 60%;
+    /* Clean muted grays */
+    --muted: 220 10% 20%;
+    --muted-foreground: 220 10% 60%;
 
-    /* Warm peach accent for progress */
-    --accent: 25 90% 60%;
-    --accent-foreground: 160 15% 6%;
-    --accent-soft: 25 50% 15%;
+    /* Bright teal accent */
+    --accent: 170 80% 45%;
+    --accent-foreground: 0 0% 100%;
+    --accent-soft: 170 50% 18%;
 
-    /* Soft amber urgency */
-    --urgency: 40 100% 60%;
-    --urgency-foreground: 160 15% 6%;
-    --urgency-soft: 40 50% 14%;
+    /* Vibrant amber urgency */
+    --urgency: 35 95% 55%;
+    --urgency-foreground: 0 0% 10%;
+    --urgency-soft: 35 60% 18%;
 
-    /* Coral-red critical */
-    --critical: 5 80% 58%;
-    --critical-foreground: 60 30% 98%;
-    --critical-soft: 5 45% 16%;
+    /* Bright red critical */
+    --critical: 0 75% 55%;
+    --critical-foreground: 0 0% 100%;
+    --critical-soft: 0 50% 18%;
 
-    /* Deep forest focus mode */
-    --focus: 160 20% 4%;
-    --focus-foreground: 60 25% 94%;
+    /* Deep focus mode */
+    --focus: 220 20% 6%;
+    --focus-foreground: 0 0% 96%;
 
-    /* Subtle green-tinted borders */
-    --border: 160 10% 20%;
-    --input: 160 10% 16%;
-    --ring: 160 70% 50%;
+    /* Visible but subtle borders */
+    --border: 220 12% 22%;
+    --input: 220 12% 18%;
+    --ring: 220 90% 56%;
 
-    /* Workload ambient backgrounds - nature-inspired */
-    --workload-light: 160 30% 9%;       /* Deep forest green */
-    --workload-moderate: 40 35% 10%;    /* Warm earth */
-    --workload-heavy: 5 30% 10%;        /* Deep terracotta */
+    /* Workload backgrounds - subtle tints on dark */
+    --workload-light: 170 25% 10%;
+    --workload-moderate: 35 25% 10%;
+    --workload-heavy: 0 20% 10%;
 
-    --glass: 160 12% 10% / 0.9;
-    --glass-border: 60 30% 96% / 0.06;
+    --glass: 220 15% 12% / 0.9;
+    --glass-border: 0 0% 100% / 0.08;
 
-    --shadow-sm: 0 1px 3px hsl(160 20% 2% / 0.5);
-    --shadow-md: 0 4px 10px -2px hsl(160 20% 2% / 0.6);
-    --shadow-lg: 0 15px 30px -5px hsl(160 20% 2% / 0.7);
-    --shadow-glow: 0 0 60px hsl(160 70% 50% / 0.2);
+    --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.4);
+    --shadow-md: 0 4px 12px -2px hsl(0 0% 0% / 0.5);
+    --shadow-lg: 0 12px 28px -6px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 0 50px hsl(220 90% 56% / 0.15);
 
-    /* Sidebar with forest atmosphere */
-    --sidebar-background: 160 15% 5%;
-    --sidebar-foreground: 60 10% 60%;
-    --sidebar-primary: 160 70% 50%;
-    --sidebar-primary-foreground: 160 15% 6%;
-    --sidebar-accent: 30 15% 15%;
-    --sidebar-accent-foreground: 60 20% 90%;
-    --sidebar-border: 160 10% 20%;
-    --sidebar-ring: 160 70% 50%;
+    /* Clean sidebar */
+    --sidebar-background: 220 15% 7%;
+    --sidebar-foreground: 220 10% 60%;
+    --sidebar-primary: 220 90% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 12% 18%;
+    --sidebar-accent-foreground: 0 0% 92%;
+    --sidebar-border: 220 12% 22%;
+    --sidebar-ring: 220 90% 56%;
 
-    --destructive: 5 80% 58%;
-    --destructive-foreground: 60 30% 98%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
   }
 }
 
