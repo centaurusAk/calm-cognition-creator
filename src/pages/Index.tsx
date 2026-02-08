@@ -6,6 +6,7 @@ import { WeekView } from '@/components/dashboard/WeekView';
 import { FocusModeWidget } from '@/components/dashboard/FocusModeWidget';
 import { CourseProgress } from '@/components/dashboard/CourseProgress';
 import { QuickStats } from '@/components/dashboard/QuickStats';
+import { AddTaskDialog } from '@/components/dashboard/AddTaskDialog';
 import { useFocusMode } from '@/hooks/useFocusMode';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { cn } from '@/lib/utils';
@@ -116,6 +117,9 @@ const Index = () => {
           <div className="fixed bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
         </>
       )}
+
+      {/* Add Task FAB */}
+      {!focusMode && <AddTaskDialog />}
     </div>
   );
 };

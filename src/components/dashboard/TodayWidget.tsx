@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Clock, Target, Sparkles } from 'lucide-react';
+import { ChevronDown, Clock, Target, Sparkles, Calendar } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Task } from '@/types/dashboard';
 import { TaskCard } from './TaskCard';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ interface TodayWidgetProps {
 
 export function TodayWidget({ tasks, totalTime }: TodayWidgetProps) {
   const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
   const displayTasks = expanded ? tasks : tasks.slice(0, 3);
   const hasMore = tasks.length > 3;
 
@@ -50,15 +52,33 @@ export function TodayWidget({ tasks, totalTime }: TodayWidgetProps) {
           </div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          className="flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-sm font-medium text-accent"
-        >
-          <Sparkles className="h-4 w-4" />
-          {tasks.filter(t => t.priority === 'high').length} urgent
-        </motion.div>
+        <div className="flex items-center gap-2">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-sm font-medium text-accent"
+          >
+            <Sparkles className="h-4 w-4" />
+            {tasks.filter(t => t.priority === 'high').length} urgent
+          </motion.div>
+          
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/calendar')}
+              className="rounded-full"
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              View Calendar
+            </Button>
+          </motion.div>
+        </div>
       </div>
 
       {/* Time Summary Bar */}

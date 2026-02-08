@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { Bell, Settings, Sun, Moon, User, Sparkles } from 'lucide-react';
+import { Bell, Settings, Sun, Moon, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   focusMode: boolean;
@@ -11,6 +12,7 @@ interface HeaderProps {
 }
 
 export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps) {
+  const navigate = useNavigate();
   const now = new Date();
   const hour = now.getHours();
   
@@ -115,9 +117,14 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
                   transition={{ delay: 0.5, type: 'spring' }}
                   className="ml-2"
                 >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground font-medium text-sm">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate('/profile')}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground font-medium text-sm cursor-pointer"
+                  >
                     A
-                  </div>
+                  </motion.button>
                 </motion.div>
               </>
             )}
