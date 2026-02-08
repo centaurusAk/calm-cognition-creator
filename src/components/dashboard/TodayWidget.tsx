@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Clock, Target, Sparkles, Calendar, Plus } from 'lucide-react';
+import { ChevronDown, Clock, Target, Sparkles } from 'lucide-react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Task } from '@/types/dashboard';
 import { TaskCard } from './TaskCard';
 import { AddTaskDialog } from './AddTaskDialog';
@@ -11,11 +10,11 @@ import { cn } from '@/lib/utils';
 interface TodayWidgetProps {
   tasks: Task[];
   totalTime: number;
+  onTaskAdd?: (task: Task) => void;
 }
 
-export function TodayWidget({ tasks, totalTime }: TodayWidgetProps) {
+export function TodayWidget({ tasks, totalTime, onTaskAdd }: TodayWidgetProps) {
   const [expanded, setExpanded] = useState(false);
-  const navigate = useNavigate();
   const displayTasks = expanded ? tasks : tasks.slice(0, 3);
   const hasMore = tasks.length > 3;
 
@@ -72,23 +71,8 @@ export function TodayWidget({ tasks, totalTime }: TodayWidgetProps) {
             <AddTaskDialog 
               variant="inline" 
               triggerClassName="rounded-full"
+              onTaskAdd={onTaskAdd}
             />
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/calendar')}
-              className="rounded-full"
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              View Calendar
-            </Button>
           </motion.div>
         </div>
       </div>
