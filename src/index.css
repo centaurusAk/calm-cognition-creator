@@ -49,9 +49,9 @@
     --critical-foreground: 0 0% 100%;
     --critical-soft: 0 84% 96%;
 
-    /* Focus mode - Deep calm */
-    --focus: 234 40% 16%;
-    --focus-foreground: 220 20% 95%;
+    /* Focus mode - Calm light blue for light mode */
+    --focus: 220 30% 92%;
+    --focus-foreground: 222 47% 11%;
 
     /* Borders and inputs */
     --border: 220 13% 91%;
