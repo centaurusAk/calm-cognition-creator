@@ -91,68 +91,79 @@
   }
 
   .dark, .focus-mode {
-    --background: 222 47% 8%;
-    --foreground: 220 20% 95%;
+    /* Deep navy-black base with warm undertones */
+    --background: 240 20% 4%;
+    --foreground: 45 20% 92%;
 
-    --card: 222 47% 11%;
-    --card-foreground: 220 20% 95%;
-    --card-elevated: 222 40% 14%;
+    /* Cards with subtle warm glow */
+    --card: 240 18% 8%;
+    --card-foreground: 45 15% 90%;
+    --card-elevated: 240 15% 12%;
 
-    --popover: 222 47% 11%;
-    --popover-foreground: 220 20% 95%;
+    --popover: 240 18% 10%;
+    --popover-foreground: 45 15% 90%;
 
-    --primary: 234 89% 67%;
+    /* Vibrant electric violet primary */
+    --primary: 270 85% 65%;
     --primary-foreground: 0 0% 100%;
-    --primary-soft: 234 50% 20%;
+    --primary-soft: 270 50% 18%;
 
-    --secondary: 222 30% 18%;
-    --secondary-foreground: 220 20% 95%;
+    /* Warm slate secondary */
+    --secondary: 240 12% 14%;
+    --secondary-foreground: 45 10% 85%;
 
-    --muted: 222 30% 18%;
-    --muted-foreground: 220 14% 60%;
+    /* Muted with warmth */
+    --muted: 240 10% 16%;
+    --muted-foreground: 45 8% 55%;
 
-    --accent: 172 66% 50%;
-    --accent-foreground: 0 0% 100%;
-    --accent-soft: 172 40% 15%;
+    /* Bright cyan accent for progress */
+    --accent: 185 80% 55%;
+    --accent-foreground: 240 20% 4%;
+    --accent-soft: 185 50% 12%;
 
-    --urgency: 38 92% 50%;
-    --urgency-foreground: 0 0% 100%;
-    --urgency-soft: 38 50% 15%;
+    /* Warm golden urgency */
+    --urgency: 45 95% 55%;
+    --urgency-foreground: 240 20% 4%;
+    --urgency-soft: 45 60% 12%;
 
-    --critical: 0 72% 51%;
+    /* Hot pink critical */
+    --critical: 350 85% 60%;
     --critical-foreground: 0 0% 100%;
-    --critical-soft: 0 50% 15%;
+    --critical-soft: 350 50% 15%;
 
-    --focus: 234 40% 6%;
-    --focus-foreground: 220 20% 95%;
+    /* Ultra-dark focus mode */
+    --focus: 270 25% 5%;
+    --focus-foreground: 45 15% 90%;
 
-    --border: 222 30% 20%;
-    --input: 222 30% 20%;
-    --ring: 234 89% 67%;
+    /* Refined borders with subtle visibility */
+    --border: 240 15% 18%;
+    --input: 240 15% 15%;
+    --ring: 270 85% 65%;
 
-    /* Workload ambient backgrounds - dark mode variants */
-    --workload-light: 172 40% 10%;      /* Deep calm teal */
-    --workload-moderate: 38 40% 10%;    /* Deep warm amber */
-    --workload-heavy: 0 40% 10%;        /* Deep coral */
+    /* Workload ambient backgrounds - rich dark variants */
+    --workload-light: 185 35% 8%;       /* Deep cyan */
+    --workload-moderate: 45 40% 8%;     /* Deep gold */
+    --workload-heavy: 350 35% 8%;       /* Deep rose */
 
-    --glass: 222 47% 11% / 0.8;
-    --glass-border: 0 0% 100% / 0.1;
+    --glass: 240 18% 8% / 0.85;
+    --glass-border: 45 20% 90% / 0.08;
 
-    --shadow-sm: 0 1px 2px hsl(0 0% 0% / 0.2);
-    --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3);
-    --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.4);
-    --shadow-glow: 0 0 60px hsl(234 89% 64% / 0.2);
+    --shadow-sm: 0 1px 3px hsl(0 0% 0% / 0.4);
+    --shadow-md: 0 4px 8px -1px hsl(0 0% 0% / 0.5);
+    --shadow-lg: 0 12px 24px -4px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 0 80px hsl(270 85% 65% / 0.25);
 
-    --sidebar-background: 222 47% 8%;
-    --sidebar-foreground: 220 14% 60%;
-    --sidebar-primary: 234 89% 67%;
+    /* Sidebar with subtle warmth */
+    --sidebar-background: 240 20% 5%;
+    --sidebar-foreground: 45 8% 55%;
+    --sidebar-primary: 270 85% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 222 30% 18%;
-    --sidebar-accent-foreground: 220 20% 95%;
-    --sidebar-border: 222 30% 20%;
-    --sidebar-ring: 234 89% 67%;
+    --sidebar-accent: 240 12% 14%;
+    --sidebar-accent-foreground: 45 10% 85%;
+    --sidebar-border: 240 15% 18%;
+    --sidebar-ring: 270 85% 65%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 350 85% 60%;
     --destructive-foreground: 0 0% 100%;
   }
 }
