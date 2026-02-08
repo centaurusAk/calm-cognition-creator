@@ -40,7 +40,7 @@ const Calendar = () => {
   const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const { tasks } = useDashboardData();
+  const { tasks, addTask } = useDashboardData();
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -224,6 +224,7 @@ const Calendar = () => {
                     <AddTaskDialog 
                       variant="inline" 
                       preselectedDate={selectedDate}
+                      onTaskAdd={addTask}
                       triggerClassName="rounded-full"
                     />
                   )}
