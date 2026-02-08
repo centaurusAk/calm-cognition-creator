@@ -33,33 +33,33 @@ export function TodayWidget({ tasks, totalTime, onTaskAdd }: TodayWidgetProps) {
       className="widget-container"
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div className="flex items-center gap-3">
           <motion.div 
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg"
+            className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-lg"
             whileHover={{ scale: 1.05, rotate: 5 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Target className="h-5 w-5" />
+            <Target className="h-4 w-4 sm:h-5 sm:w-5" />
           </motion.div>
-          <div>
-            <h2 className="font-display text-lg font-semibold text-foreground">
+          <div className="min-w-0">
+            <h2 className="font-display text-base sm:text-lg font-semibold text-foreground">
               Today's Focus
             </h2>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               {tasks.length} task{tasks.length !== 1 ? 's' : ''} • {formatTime(totalTime)} estimated
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-end sm:self-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1.5 text-sm font-medium text-accent"
+            className="flex items-center gap-1.5 sm:gap-2 rounded-full bg-accent-soft px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium text-accent"
           >
-            <Sparkles className="h-4 w-4" />
+            <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
             {tasks.filter(t => t.priority === 'high').length} urgent
           </motion.div>
           
@@ -70,7 +70,7 @@ export function TodayWidget({ tasks, totalTime, onTaskAdd }: TodayWidgetProps) {
           >
             <AddTaskDialog 
               variant="inline" 
-              triggerClassName="rounded-full"
+              triggerClassName="rounded-full text-xs sm:text-sm px-2 sm:px-4"
               onTaskAdd={onTaskAdd}
             />
           </motion.div>

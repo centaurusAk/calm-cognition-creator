@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, X, Clock, BookOpen, Flag, Calendar } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Plus, Clock, BookOpen, Flag, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const priorityOptions = [
   { value: 'high', label: 'High', color: 'bg-critical text-critical' },
@@ -36,14 +38,10 @@ const typeOptions = [
   { value: 'lab', label: 'Lab' },
 ];
 
-const courseOptions = [
-  { value: 'CS301', label: 'CS301 - Database Systems' },
-  { value: 'CS201', label: 'CS201 - Data Structures' },
-  { value: 'CS305', label: 'CS305 - Operating Systems' },
-  { value: 'CS401', label: 'CS401 - Machine Learning' },
-  { value: 'CS499', label: 'CS499 - Capstone Project' },
-  { value: 'CS302', label: 'CS302 - Computer Networks' },
-];
+interface CourseOption {
+  value: string;
+  label: string;
+}
 
 interface AddTaskDialogProps {
   onTaskAdd?: (task: any) => void;
@@ -55,6 +53,7 @@ interface AddTaskDialogProps {
 export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, preselectedDate }: AddTaskDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [courseOptions, setCourseOptions] = useState<CourseOption[]>([]);
   
   const formatDateForInput = (date: Date) => {
     return date.toISOString().split('T')[0];
@@ -69,6 +68,42 @@ export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, pr
     dueDate: preselectedDate ? formatDateForInput(preselectedDate) : '',
     description: '',
   });
+
+  // Fetch courses from database
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('code, name')
+        .order('name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching courses:', error);
+        return;
+      }
+
+      const options = (data || []).map(course => ({
+        value: course.code,
+        label: `${course.code} - ${course.name}`,
+      }));
+
+      setCourseOptions(options);
+    };
+
+    if (open) {
+      fetchCourses();
+    }
+  }, [open]);
+
+  // Update due date when preselectedDate changes
+  useEffect(() => {
+    if (preselectedDate) {
+      setFormData(prev => ({
+        ...prev,
+        dueDate: formatDateForInput(preselectedDate),
+      }));
+    }
+  }, [preselectedDate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,22 +123,18 @@ export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, pr
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
     const newTask = {
       id: Date.now().toString(),
-      ...formData,
+      title: formData.title,
+      course: formData.course,
+      type: formData.type as 'quiz' | 'assignment' | 'project' | 'reading' | 'lab',
+      priority: formData.priority as 'high' | 'medium' | 'low',
       estimatedTime: parseInt(formData.estimatedTime),
       dueDate: new Date(formData.dueDate),
       status: 'pending' as const,
     };
     
-    onTaskAdd?.(newTask);
-    
-    toast.success('Task added successfully!', {
-      description: `"${formData.title}" has been added to your tasks.`,
-    });
+    await onTaskAdd?.(newTask);
     
     setFormData({
       title: '',
@@ -111,7 +142,7 @@ export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, pr
       type: 'assignment',
       priority: 'medium',
       estimatedTime: '60',
-      dueDate: '',
+      dueDate: preselectedDate ? formatDateForInput(preselectedDate) : '',
       description: '',
     });
     
@@ -129,68 +160,72 @@ export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, pr
           >
             <Button
               size="lg"
-              className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 z-50"
+              className="fixed bottom-6 right-4 sm:bottom-8 sm:right-8 h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-lg bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 z-50"
             >
-              <Plus className="h-6 w-6" />
+              <Plus className="h-5 w-5 sm:h-6 sm:w-6" />
             </Button>
           </motion.div>
         ) : (
           <Button
             variant="default"
             size="sm"
-            className={cn("bg-gradient-to-r from-primary to-primary/80", triggerClassName)}
+            className={cn("bg-gradient-to-r from-primary to-primary/80 h-8 sm:h-9", triggerClassName)}
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Task
+            <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden xs:inline">Add Task</span>
+            <span className="xs:hidden">Add</span>
           </Button>
         )}
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-[500px] p-0 overflow-hidden max-h-[90vh] overflow-y-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6"
+          className="p-4 sm:p-6"
         >
           <DialogHeader>
-            <DialogTitle className="font-display text-2xl flex items-center gap-2">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Plus className="h-5 w-5 text-primary" />
+            <DialogTitle className="font-display text-xl sm:text-2xl flex items-center gap-2">
+              <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Plus className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               Add New Task
             </DialogTitle>
+            <DialogDescription className="sr-only">
+              Fill in the details below to create a new task
+            </DialogDescription>
           </DialogHeader>
           
-          <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+          <form onSubmit={handleSubmit} className="mt-4 sm:mt-6 space-y-4 sm:space-y-5">
             {/* Task Title */}
-            <div className="space-y-2">
-              <Label htmlFor="title">Task Title</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="title" className="text-sm">Task Title</Label>
               <Input
                 id="title"
                 placeholder="Enter task title..."
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="h-11"
+                className="h-10 sm:h-11"
               />
             </div>
 
             {/* Course & Type Row */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="flex items-center gap-1.5 sm:gap-2 text-sm">
+                  <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                   Course
                 </Label>
                 <Select
                   value={formData.course}
                   onValueChange={(value) => setFormData({ ...formData, course: value })}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select course" />
+                  <SelectTrigger className="h-10 sm:h-11 text-sm">
+                    <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
                     {courseOptions.map(course => (
-                      <SelectItem key={course.value} value={course.value}>
+                      <SelectItem key={course.value} value={course.value} className="text-sm">
                         {course.label}
                       </SelectItem>
                     ))}
@@ -198,18 +233,18 @@ export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, pr
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label>Type</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="text-sm">Type</Label>
                 <Select
                   value={formData.type}
                   onValueChange={(value) => setFormData({ ...formData, type: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-10 sm:h-11 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {typeOptions.map(type => (
-                      <SelectItem key={type.value} value={type.value}>
+                      <SelectItem key={type.value} value={type.value} className="text-sm">
                         {type.label}
                       </SelectItem>
                     ))}
@@ -219,9 +254,9 @@ export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, pr
             </div>
 
             {/* Priority Selection */}
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Flag className="h-4 w-4 text-muted-foreground" />
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label className="flex items-center gap-1.5 sm:gap-2 text-sm">
+                <Flag className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                 Priority
               </Label>
               <div className="flex gap-2">
@@ -233,7 +268,7 @@ export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, pr
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setFormData({ ...formData, priority: priority.value })}
                     className={cn(
-                      "flex-1 py-3 px-4 rounded-xl border-2 transition-all font-medium",
+                      "flex-1 py-2 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl border-2 transition-all font-medium text-xs sm:text-sm",
                       formData.priority === priority.value
                         ? cn(priority.color, "border-current bg-current/10")
                         : "border-muted hover:border-muted-foreground/30"
@@ -246,24 +281,24 @@ export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, pr
             </div>
 
             {/* Due Date & Estimated Time */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="flex items-center gap-1.5 sm:gap-2 text-sm">
+                  <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                   Due Date
                 </Label>
                 <Input
                   type="date"
                   value={formData.dueDate}
                   onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                  className="h-11"
+                  className="h-10 sm:h-11 text-sm"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  Est. Time (min)
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="flex items-center gap-1.5 sm:gap-2 text-sm">
+                  <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+                  Time (min)
                 </Label>
                 <Input
                   type="number"
@@ -271,37 +306,37 @@ export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, pr
                   max="480"
                   value={formData.estimatedTime}
                   onChange={(e) => setFormData({ ...formData, estimatedTime: e.target.value })}
-                  className="h-11"
+                  className="h-10 sm:h-11 text-sm"
                 />
               </div>
             </div>
 
-            {/* Description */}
-            <div className="space-y-2">
-              <Label htmlFor="description">Description (Optional)</Label>
+            {/* Description - Hidden on mobile for cleaner UX */}
+            <div className="space-y-1.5 sm:space-y-2 hidden sm:block">
+              <Label htmlFor="description" className="text-sm">Description (Optional)</Label>
               <Textarea
                 id="description"
                 placeholder="Add any additional notes..."
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="resize-none"
-                rows={3}
+                className="resize-none text-sm"
+                rows={2}
               />
             </div>
 
             {/* Actions */}
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-2 sm:gap-3 pt-2">
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1"
+                className="flex-1 h-10 sm:h-11 text-sm"
                 onClick={() => setOpen(false)}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-primary to-primary/80"
+                className="flex-1 h-10 sm:h-11 text-sm bg-gradient-to-r from-primary to-primary/80"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
@@ -313,7 +348,7 @@ export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, pr
                   </motion.div>
                 ) : (
                   <>
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 mr-1 sm:mr-2" />
                     Add Task
                   </>
                 )}
