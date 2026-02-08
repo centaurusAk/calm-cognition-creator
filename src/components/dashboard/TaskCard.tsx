@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, BookOpen, FlaskConical, FileText, Pencil, AlertCircle, Trash2 } from 'lucide-react';
 import { Task } from '@/types/dashboard';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { EditTaskDialog } from './EditTaskDialog';
 
 const typeIcons = {
   quiz: BookOpen,
@@ -24,10 +26,12 @@ interface TaskCardProps {
   index: number;
   compact?: boolean;
   onDelete?: (taskId: string) => void;
+  onUpdate?: (task: Task) => Promise<void>;
 }
 
-export function TaskCard({ task, index, compact = false, onDelete }: TaskCardProps) {
+export function TaskCard({ task, index, compact = false, onDelete, onUpdate }: TaskCardProps) {
   const Icon = typeIcons[task.type];
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   const formatDueDate = () => {
     if (isToday(task.dueDate)) {
@@ -44,6 +48,11 @@ export function TaskCard({ task, index, compact = false, onDelete }: TaskCardPro
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     onDelete?.(task.id);
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditDialogOpen(true);
   };
 
   return (
@@ -144,22 +153,28 @@ export function TaskCard({ task, index, compact = false, onDelete }: TaskCardPro
             </motion.div>
           )}
 
+          {/* Edit button - visible on hover */}
+          {onUpdate && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleEditClick}
+              className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground/50 hover:text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all"
+            >
+              <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
+          )}
+
           {/* Delete button - visible on hover */}
           {onDelete && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              whileHover={{ scale: 1.1 }}
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleDelete}
+              className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground/50 hover:text-critical hover:bg-critical/10 opacity-0 group-hover:opacity-100 transition-all"
             >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleDelete}
-                className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-critical hover:bg-critical/10"
-              >
-                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-              </Button>
-            </motion.div>
+              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
           )}
         </div>
       </div>
@@ -171,6 +186,16 @@ export function TaskCard({ task, index, compact = false, onDelete }: TaskCardPro
           background: 'radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), hsl(var(--primary) / 0.06), transparent 40%)',
         }}
       />
+
+      {/* Edit Dialog */}
+      {onUpdate && (
+        <EditTaskDialog
+          task={task}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onTaskUpdate={onUpdate}
+        />
+      )}
     </motion.div>
   );
 }

@@ -1,11 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ChevronLeft, ChevronRight, Clock, BookOpen, Loader2, Trash2 } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Clock, BookOpen, Loader2, Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AddTaskDialog } from '@/components/dashboard/AddTaskDialog';
+import { EditTaskDialog } from '@/components/dashboard/EditTaskDialog';
 import { useNavigate } from 'react-router-dom';
 import { useState, useMemo } from 'react';
+import { Task } from '@/types/dashboard';
 import { cn } from '@/lib/utils';
 import { 
   format, 
@@ -21,7 +23,6 @@ import {
   isToday
 } from 'date-fns';
 import { useDashboardData } from '@/hooks/useDashboardData';
-import { Task } from '@/types/dashboard';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -40,7 +41,8 @@ const Calendar = () => {
   const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const { tasks, addTask, deleteTask, loading } = useDashboardData();
+  const { tasks, addTask, updateTask, deleteTask, loading } = useDashboardData();
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -270,7 +272,7 @@ const Calendar = () => {
                         >
                           <div className="flex items-start justify-between gap-2">
                             <h4 className="font-medium text-sm flex-1 min-w-0">{task.title}</h4>
-                            <div className="flex items-center gap-1.5 shrink-0">
+                            <div className="flex items-center gap-1 shrink-0">
                               <Badge 
                                 variant="outline" 
                                 className={cn(
@@ -282,6 +284,14 @@ const Calendar = () => {
                               >
                                 {task.priority}
                               </Badge>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setEditingTask(task)}
+                                className="h-7 w-7 text-muted-foreground/50 hover:text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all"
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -323,6 +333,16 @@ const Calendar = () => {
           </motion.div>
         </div>
       </main>
+
+      {/* Edit Task Dialog */}
+      {editingTask && (
+        <EditTaskDialog
+          task={editingTask}
+          open={!!editingTask}
+          onOpenChange={(open) => !open && setEditingTask(null)}
+          onTaskUpdate={updateTask}
+        />
+      )}
     </div>
   );
 };
