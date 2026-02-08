@@ -47,18 +47,26 @@ const courseOptions = [
 
 interface AddTaskDialogProps {
   onTaskAdd?: (task: any) => void;
+  variant?: 'fab' | 'inline';
+  triggerClassName?: string;
+  preselectedDate?: Date;
 }
 
-export function AddTaskDialog({ onTaskAdd }: AddTaskDialogProps) {
+export function AddTaskDialog({ onTaskAdd, variant = 'fab', triggerClassName, preselectedDate }: AddTaskDialogProps) {
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const formatDateForInput = (date: Date) => {
+    return date.toISOString().split('T')[0];
+  };
+  
   const [formData, setFormData] = useState({
     title: '',
     course: '',
     type: 'assignment',
     priority: 'medium',
     estimatedTime: '60',
-    dueDate: '',
+    dueDate: preselectedDate ? formatDateForInput(preselectedDate) : '',
     description: '',
   });
 
@@ -114,17 +122,28 @@ export function AddTaskDialog({ onTaskAdd }: AddTaskDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button
-            size="lg"
-            className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 z-50"
+        {variant === 'fab' ? (
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <Plus className="h-6 w-6" />
+            <Button
+              size="lg"
+              className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-gradient-to-br from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 z-50"
+            >
+              <Plus className="h-6 w-6" />
+            </Button>
+          </motion.div>
+        ) : (
+          <Button
+            variant="default"
+            size="sm"
+            className={cn("bg-gradient-to-r from-primary to-primary/80", triggerClassName)}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Task
           </Button>
-        </motion.div>
+        )}
       </DialogTrigger>
       
       <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">

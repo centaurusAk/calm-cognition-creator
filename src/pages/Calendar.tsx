@@ -1,8 +1,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ChevronLeft, ChevronRight, Clock, BookOpen } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Clock, BookOpen, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { AddTaskDialog } from '@/components/dashboard/AddTaskDialog';
 import { useNavigate } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
@@ -214,10 +215,19 @@ const Calendar = () => {
           >
             <Card className="sticky top-24">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5 text-primary" />
-                  {selectedDate ? format(selectedDate, 'EEEE, MMM d') : 'Select a date'}
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    {selectedDate ? format(selectedDate, 'EEEE, MMM d') : 'Select a date'}
+                  </CardTitle>
+                  {selectedDate && (
+                    <AddTaskDialog 
+                      variant="inline" 
+                      preselectedDate={selectedDate}
+                      triggerClassName="rounded-full"
+                    />
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 <AnimatePresence mode="wait">
