@@ -12,9 +12,10 @@ interface TodayWidgetProps {
   totalTime: number;
   onTaskAdd?: (task: Task) => void;
   onTaskDelete?: (taskId: string) => void;
+  onTaskUpdate?: (task: Task) => Promise<void>;
 }
 
-export function TodayWidget({ tasks, totalTime, onTaskAdd, onTaskDelete }: TodayWidgetProps) {
+export function TodayWidget({ tasks, totalTime, onTaskAdd, onTaskDelete, onTaskUpdate }: TodayWidgetProps) {
   const [expanded, setExpanded] = useState(false);
   const displayTasks = expanded ? tasks : tasks.slice(0, 3);
   const hasMore = tasks.length > 3;
@@ -116,7 +117,7 @@ export function TodayWidget({ tasks, totalTime, onTaskAdd, onTaskDelete }: Today
       <div className="space-y-3">
         <AnimatePresence mode="popLayout">
           {displayTasks.map((task, index) => (
-            <TaskCard key={task.id} task={task} index={index} onDelete={onTaskDelete} />
+            <TaskCard key={task.id} task={task} index={index} onDelete={onTaskDelete} onUpdate={onTaskUpdate} />
           ))}
         </AnimatePresence>
       </div>

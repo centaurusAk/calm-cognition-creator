@@ -132,6 +132,43 @@ export function useDashboardData() {
     }
   }, [toast]);
 
+  // Update a task in Supabase
+  const updateTask = useCallback(async (updatedTask: Task) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({
+          title: updatedTask.title,
+          course: updatedTask.course,
+          due_date: updatedTask.dueDate.toISOString(),
+          estimated_time: updatedTask.estimatedTime,
+          priority: updatedTask.priority,
+          status: updatedTask.status,
+          type: updatedTask.type,
+        })
+        .eq('id', updatedTask.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setTasks(prev => prev.map(t => 
+        t.id === updatedTask.id ? updatedTask : t
+      ).sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime()));
+
+      toast({
+        title: 'Task updated',
+        description: `"${updatedTask.title}" has been updated.`,
+      });
+    } catch (error) {
+      console.error('Error updating task:', error);
+      toast({
+        title: 'Error updating task',
+        description: 'Could not update the task.',
+        variant: 'destructive',
+      });
+    }
+  }, [toast]);
+
   // Delete a task from Supabase
   const deleteTask = useCallback(async (taskId: string) => {
     try {
@@ -185,6 +222,7 @@ export function useDashboardData() {
     weekTasks,
     totalEstimatedTime,
     addTask,
+    updateTask,
     deleteTask,
     loading,
     refetchTasks: fetchTasks,
