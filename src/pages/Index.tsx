@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Header } from '@/components/dashboard/Header';
 import { TodayWidget } from '@/components/dashboard/TodayWidget';
 import { WeekView } from '@/components/dashboard/WeekView';
@@ -11,10 +11,19 @@ import { useDashboardData } from '@/hooks/useDashboardData';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 
+type WorkloadLevel = 'light' | 'moderate' | 'heavy';
+
 const Index = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { focusMode, session, startFocus, pauseFocus, resumeFocus, endFocus } = useFocusMode();
   const { todayTasks, weekTasks, courses, totalEstimatedTime, addTask, loading } = useDashboardData();
+
+  // Calculate workload level based on estimated time
+  const workloadLevel: WorkloadLevel = useMemo(() => {
+    if (totalEstimatedTime <= 120) return 'light';
+    if (totalEstimatedTime <= 180) return 'moderate';
+    return 'heavy';
+  }, [totalEstimatedTime]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -25,6 +34,30 @@ const Index = () => {
   }, [isDarkMode]);
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+
+  // Workload-based styling
+  const workloadStyles = {
+    light: {
+      bg: 'bg-[hsl(var(--workload-light))]',
+      glow1: 'bg-accent/10',
+      glow2: 'bg-primary/8',
+      message: '✨ Light day ahead',
+    },
+    moderate: {
+      bg: 'bg-[hsl(var(--workload-moderate))]',
+      glow1: 'bg-urgency/10',
+      glow2: 'bg-primary/8',
+      message: '⚡ Moderate workload',
+    },
+    heavy: {
+      bg: 'bg-[hsl(var(--workload-heavy))]',
+      glow1: 'bg-critical/10',
+      glow2: 'bg-urgency/8',
+      message: '🔥 Heavy workload - stay focused',
+    },
+  };
+
+  const currentStyle = workloadStyles[workloadLevel];
 
   if (loading) {
     return (
@@ -42,10 +75,16 @@ const Index = () => {
   }
 
   return (
-    <div className={cn(
-      'min-h-screen transition-colors duration-500',
-      focusMode ? 'bg-focus' : 'bg-background'
-    )}>
+    <motion.div 
+      key={workloadLevel}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      className={cn(
+        'min-h-screen transition-colors duration-700',
+        focusMode ? 'bg-focus' : currentStyle.bg
+      )}
+    >
       <Header 
         focusMode={focusMode} 
         onToggleDarkMode={toggleDarkMode}
@@ -118,7 +157,7 @@ const Index = () => {
                 className="text-center py-4 sm:py-8 hidden sm:block"
               >
                 <p className="text-sm text-muted-foreground">
-                  💡 Tip: Start a focus session to hide distractions and boost concentration
+                  {currentStyle.message} • 💡 Start a focus session to boost concentration
                 </p>
               </motion.div>
             </motion.div>
@@ -126,14 +165,41 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
-      {/* Ambient decoration */}
+      {/* Ambient decoration - changes based on workload */}
       {!focusMode && (
         <>
-          <div className="fixed top-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="fixed bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl pointer-events-none" />
+          <motion.div 
+            key={`glow1-${workloadLevel}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            className={cn(
+              "fixed top-0 left-0 w-80 sm:w-96 h-80 sm:h-96 rounded-full blur-3xl pointer-events-none transition-colors duration-700",
+              currentStyle.glow1
+            )} 
+          />
+          <motion.div 
+            key={`glow2-${workloadLevel}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className={cn(
+              "fixed bottom-0 right-0 w-80 sm:w-96 h-80 sm:h-96 rounded-full blur-3xl pointer-events-none transition-colors duration-700",
+              currentStyle.glow2
+            )} 
+          />
+          {/* Extra accent glow for heavy workload */}
+          {workloadLevel === 'heavy' && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1.5 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none bg-critical/5"
+            />
+          )}
         </>
       )}
-    </div>
+    </motion.div>
   );
 };
 
