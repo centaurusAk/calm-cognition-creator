@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { Clock, BookOpen, FlaskConical, FileText, Pencil, AlertCircle } from 'lucide-react';
+import { Clock, BookOpen, FlaskConical, FileText, Pencil, AlertCircle, Trash2 } from 'lucide-react';
 import { Task } from '@/types/dashboard';
-import { format, isToday, isTomorrow, formatDistanceToNow } from 'date-fns';
+import { format, isToday, isTomorrow } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 
 const typeIcons = {
   quiz: BookOpen,
@@ -22,9 +23,10 @@ interface TaskCardProps {
   task: Task;
   index: number;
   compact?: boolean;
+  onDelete?: (taskId: string) => void;
 }
 
-export function TaskCard({ task, index, compact = false }: TaskCardProps) {
+export function TaskCard({ task, index, compact = false, onDelete }: TaskCardProps) {
   const Icon = typeIcons[task.type];
   
   const formatDueDate = () => {
@@ -39,11 +41,16 @@ export function TaskCard({ task, index, compact = false }: TaskCardProps) {
 
   const isUrgent = task.priority === 'high' && isToday(task.dueDate);
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete?.(task.id);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
+      exit={{ opacity: 0, x: -100, scale: 0.8 }}
       transition={{ 
         duration: 0.3, 
         delay: index * 0.05,
@@ -64,7 +71,7 @@ export function TaskCard({ task, index, compact = false }: TaskCardProps) {
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="absolute -top-2 -right-2 flex items-center gap-1 rounded-full bg-critical px-2 py-1 text-xs font-medium text-critical-foreground"
+          className="absolute -top-2 -right-2 flex items-center gap-1 rounded-full bg-critical px-2 py-1 text-xs font-medium text-critical-foreground z-10"
         >
           <AlertCircle className="h-3 w-3" />
           Urgent
@@ -120,22 +127,41 @@ export function TaskCard({ task, index, compact = false }: TaskCardProps) {
           </div>
         </div>
 
-        {task.status === 'in-progress' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="shrink-0"
-          >
-            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-              <motion.span 
-                className="h-1.5 w-1.5 rounded-full bg-primary"
-                animate={{ opacity: [1, 0.5, 1] }}
-                transition={{ repeat: Infinity, duration: 1.5 }}
-              />
-              In Progress
-            </span>
-          </motion.div>
-        )}
+        <div className="flex items-center gap-1 shrink-0">
+          {task.status === 'in-progress' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                <motion.span 
+                  className="h-1.5 w-1.5 rounded-full bg-primary"
+                  animate={{ opacity: [1, 0.5, 1] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                />
+                <span className="hidden sm:inline">In Progress</span>
+              </span>
+            </motion.div>
+          )}
+
+          {/* Delete button - visible on hover */}
+          {onDelete && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileHover={{ scale: 1.1 }}
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleDelete}
+                className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-critical hover:bg-critical/10"
+              >
+                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </Button>
+            </motion.div>
+          )}
+        </div>
       </div>
 
       {/* Hover glow effect */}

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ChevronLeft, ChevronRight, Clock, BookOpen, Loader2 } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Clock, BookOpen, Loader2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -40,7 +40,7 @@ const Calendar = () => {
   const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const { tasks, addTask, loading } = useDashboardData();
+  const { tasks, addTask, deleteTask, loading } = useDashboardData();
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -264,23 +264,39 @@ const Calendar = () => {
                           key={task.id}
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -50, scale: 0.8 }}
                           transition={{ delay: index * 0.1 }}
-                          whileHover={{ x: 4 }}
-                          className="p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors space-y-2"
+                          className="group p-3 sm:p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors space-y-2"
                         >
-                          <div className="flex items-start justify-between">
-                            <h4 className="font-medium text-sm">{task.title}</h4>
-                            <Badge 
-                              variant="outline" 
-                              className={cn(
-                                "text-xs",
-                                task.priority === 'high' && "border-critical text-critical",
-                                task.priority === 'medium' && "border-urgency text-urgency",
-                                task.priority === 'low' && "border-accent text-accent"
-                              )}
-                            >
-                              {task.priority}
-                            </Badge>
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="font-medium text-sm flex-1 min-w-0">{task.title}</h4>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <Badge 
+                                variant="outline" 
+                                className={cn(
+                                  "text-xs",
+                                  task.priority === 'high' && "border-critical text-critical",
+                                  task.priority === 'medium' && "border-urgency text-urgency",
+                                  task.priority === 'low' && "border-accent text-accent"
+                                )}
+                              >
+                                {task.priority}
+                              </Badge>
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                whileHover={{ scale: 1.1 }}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => deleteTask(task.id)}
+                                  className="h-7 w-7 text-muted-foreground hover:text-critical hover:bg-critical/10"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </motion.div>
+                            </div>
                           </div>
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">

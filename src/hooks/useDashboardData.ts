@@ -132,6 +132,33 @@ export function useDashboardData() {
     }
   }, [toast]);
 
+  // Delete a task from Supabase
+  const deleteTask = useCallback(async (taskId: string) => {
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', taskId);
+
+      if (error) throw error;
+
+      // Update local state
+      setTasks(prev => prev.filter(t => t.id !== taskId));
+
+      toast({
+        title: 'Task deleted',
+        description: 'The task has been removed.',
+      });
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      toast({
+        title: 'Error deleting task',
+        description: 'Could not delete the task.',
+        variant: 'destructive',
+      });
+    }
+  }, [toast]);
+
   const todayTasks = useMemo(() => 
     tasks.filter(t => t.dueDate <= addDays(today, 1) && t.status !== 'completed')
       .sort((a, b) => {
@@ -158,6 +185,7 @@ export function useDashboardData() {
     weekTasks,
     totalEstimatedTime,
     addTask,
+    deleteTask,
     loading,
     refetchTasks: fetchTasks,
     refetchCourses: fetchCourses,

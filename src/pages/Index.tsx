@@ -16,7 +16,7 @@ type WorkloadLevel = 'light' | 'moderate' | 'heavy';
 const Index = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { focusMode, session, startFocus, pauseFocus, resumeFocus, endFocus } = useFocusMode();
-  const { todayTasks, weekTasks, courses, totalEstimatedTime, addTask, loading } = useDashboardData();
+  const { todayTasks, weekTasks, courses, totalEstimatedTime, addTask, deleteTask, loading } = useDashboardData();
 
   // Calculate workload level based on estimated time
   const workloadLevel: WorkloadLevel = useMemo(() => {
@@ -131,6 +131,7 @@ const Index = () => {
                     tasks={todayTasks} 
                     totalTime={totalEstimatedTime}
                     onTaskAdd={addTask}
+                    onTaskDelete={deleteTask}
                   />
                   <WeekView tasks={weekTasks} />
                 </div>
