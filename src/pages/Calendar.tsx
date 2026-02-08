@@ -282,20 +282,14 @@ const Calendar = () => {
                               >
                                 {task.priority}
                               </Badge>
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                whileHover={{ scale: 1.1 }}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => deleteTask(task.id)}
+                                className="h-7 w-7 text-muted-foreground/50 hover:text-critical hover:bg-critical/10 opacity-0 group-hover:opacity-100 transition-all"
                               >
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => deleteTask(task.id)}
-                                  className="h-7 w-7 text-muted-foreground hover:text-critical hover:bg-critical/10"
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
-                              </motion.div>
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
                             </div>
                           </div>
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
