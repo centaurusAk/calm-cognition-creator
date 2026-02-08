@@ -60,6 +60,11 @@
 
     --radius: 0.75rem;
 
+    /* Workload ambient backgrounds - subtle gradient bases */
+    --workload-light: 172 50% 96%;      /* Calm teal tint */
+    --workload-moderate: 38 40% 96%;    /* Warm amber tint */
+    --workload-heavy: 0 40% 96%;        /* Subtle coral tint */
+
     /* Glassmorphism */
     --glass: 0 0% 100% / 0.7;
     --glass-border: 0 0% 100% / 0.2;
@@ -124,6 +129,11 @@
     --border: 222 30% 20%;
     --input: 222 30% 20%;
     --ring: 234 89% 67%;
+
+    /* Workload ambient backgrounds - dark mode variants */
+    --workload-light: 172 40% 10%;      /* Deep calm teal */
+    --workload-moderate: 38 40% 10%;    /* Deep warm amber */
+    --workload-heavy: 0 40% 10%;        /* Deep coral */
 
     --glass: 222 47% 11% / 0.8;
     --glass-border: 0 0% 100% / 0.1;
