@@ -54,37 +54,37 @@ export function QuickStats({ focusMode }: QuickStatsProps) {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: index * 0.1, type: 'spring', stiffness: 500 }}
           whileHover={{ y: -4, transition: { duration: 0.2 } }}
-          className="relative overflow-hidden rounded-2xl bg-card p-4 shadow-md border border-border/50"
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-card p-3 sm:p-4 shadow-md border border-border/50"
         >
           {/* Gradient Background */}
           <div className={cn(
-            'absolute top-0 right-0 h-20 w-20 opacity-10 blur-2xl',
+            'absolute top-0 right-0 h-16 w-16 sm:h-20 sm:w-20 opacity-10 blur-2xl',
             `bg-gradient-to-br ${stat.color}`
           )} />
           
           <div className="relative z-10">
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
               <motion.div
                 whileHover={{ rotate: 10, scale: 1.1 }}
                 className={cn(
-                  'flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br text-white',
+                  'flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-br text-white',
                   stat.color
                 )}
               >
-                <stat.icon className="h-5 w-5" />
+                <stat.icon className="h-4 w-4 sm:h-5 sm:w-5" />
               </motion.div>
             </div>
             
             <motion.p 
-              className="text-2xl font-display font-bold text-foreground"
+              className="text-xl sm:text-2xl font-display font-bold text-foreground"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 + index * 0.1 }}
             >
               {stat.value}
             </motion.p>
-            <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-            <p className="text-xs text-muted-foreground/70 mt-1">{stat.change}</p>
+            <p className="text-xs sm:text-sm font-medium text-muted-foreground">{stat.label}</p>
+            <p className="text-xs text-muted-foreground/70 mt-0.5 sm:mt-1 hidden sm:block">{stat.change}</p>
           </div>
         </motion.div>
       ))}

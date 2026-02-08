@@ -1,87 +1,136 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Task, Course } from '@/types/dashboard';
-import { addDays, addHours, startOfDay } from 'date-fns';
+import { addDays, startOfDay } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const today = startOfDay(new Date());
 
-const initialTasks: Task[] = [
-  {
-    id: '1',
-    title: 'Database Systems Quiz 3',
-    course: 'CS301',
-    dueDate: addHours(today, 4),
-    estimatedTime: 45,
-    priority: 'high',
-    status: 'pending',
-    type: 'quiz',
-  },
-  {
-    id: '2',
-    title: 'Algorithm Analysis Assignment',
-    course: 'CS201',
-    dueDate: addDays(today, 1),
-    estimatedTime: 120,
-    priority: 'high',
-    status: 'in-progress',
-    type: 'assignment',
-  },
-  {
-    id: '3',
-    title: 'OS Lab Report',
-    course: 'CS305',
-    dueDate: addDays(today, 2),
-    estimatedTime: 90,
-    priority: 'medium',
-    status: 'pending',
-    type: 'lab',
-  },
-  {
-    id: '4',
-    title: 'Machine Learning Reading',
-    course: 'CS401',
-    dueDate: addDays(today, 3),
-    estimatedTime: 60,
-    priority: 'low',
-    status: 'pending',
-    type: 'reading',
-  },
-  {
-    id: '5',
-    title: 'Capstone Project Milestone',
-    course: 'CS499',
-    dueDate: addDays(today, 5),
-    estimatedTime: 180,
-    priority: 'medium',
-    status: 'in-progress',
-    type: 'project',
-  },
-  {
-    id: '6',
-    title: 'Networks Assignment',
-    course: 'CS302',
-    dueDate: addDays(today, 7),
-    estimatedTime: 75,
-    priority: 'low',
-    status: 'pending',
-    type: 'assignment',
-  },
-];
-
 export function useDashboardData() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  const courses: Course[] = useMemo(() => [
-    { id: '1', name: 'Database Systems', code: 'CS301', color: '#6366f1', progress: 72 },
-    { id: '2', name: 'Data Structures & Algorithms', code: 'CS201', color: '#14b8a6', progress: 85 },
-    { id: '3', name: 'Operating Systems', code: 'CS305', color: '#f59e0b', progress: 60 },
-    { id: '4', name: 'Machine Learning', code: 'CS401', color: '#ec4899', progress: 45 },
-    { id: '5', name: 'Capstone Project', code: 'CS499', color: '#8b5cf6', progress: 30 },
-    { id: '6', name: 'Computer Networks', code: 'CS302', color: '#22c55e', progress: 55 },
-  ], []);
+  // Fetch tasks from Supabase
+  const fetchTasks = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .select('*')
+        .order('due_date', { ascending: true });
 
-  const addTask = useCallback((newTask: Task) => {
-    setTasks(prev => [...prev, newTask]);
-  }, []);
+      if (error) throw error;
+
+      const formattedTasks: Task[] = (data || []).map(task => ({
+        id: task.id,
+        title: task.title,
+        course: task.course,
+        dueDate: new Date(task.due_date),
+        estimatedTime: task.estimated_time,
+        priority: task.priority as Task['priority'],
+        status: task.status as Task['status'],
+        type: task.type as Task['type'],
+      }));
+
+      setTasks(formattedTasks);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      toast({
+        title: 'Error loading tasks',
+        description: 'Could not fetch tasks from the database.',
+        variant: 'destructive',
+      });
+    }
+  }, [toast]);
+
+  // Fetch courses from Supabase
+  const fetchCourses = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) throw error;
+
+      const formattedCourses: Course[] = (data || []).map(course => ({
+        id: course.id,
+        name: course.name,
+        code: course.code,
+        color: course.color,
+        progress: course.progress,
+      }));
+
+      setCourses(formattedCourses);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      toast({
+        title: 'Error loading courses',
+        description: 'Could not fetch courses from the database.',
+        variant: 'destructive',
+      });
+    }
+  }, [toast]);
+
+  // Initial data fetch
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchTasks(), fetchCourses()]);
+      setLoading(false);
+    };
+    loadData();
+  }, [fetchTasks, fetchCourses]);
+
+  // Add a new task to Supabase
+  const addTask = useCallback(async (newTask: Task) => {
+    try {
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert({
+          title: newTask.title,
+          course: newTask.course,
+          due_date: newTask.dueDate.toISOString(),
+          estimated_time: newTask.estimatedTime,
+          priority: newTask.priority,
+          status: newTask.status,
+          type: newTask.type,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update local state with the inserted task
+      const insertedTask: Task = {
+        id: data.id,
+        title: data.title,
+        course: data.course,
+        dueDate: new Date(data.due_date),
+        estimatedTime: data.estimated_time,
+        priority: data.priority as Task['priority'],
+        status: data.status as Task['status'],
+        type: data.type as Task['type'],
+      };
+
+      setTasks(prev => [...prev, insertedTask].sort((a, b) => 
+        a.dueDate.getTime() - b.dueDate.getTime()
+      ));
+
+      toast({
+        title: 'Task added',
+        description: `"${newTask.title}" has been added to your tasks.`,
+      });
+    } catch (error) {
+      console.error('Error adding task:', error);
+      toast({
+        title: 'Error adding task',
+        description: 'Could not save the task to the database.',
+        variant: 'destructive',
+      });
+    }
+  }, [toast]);
 
   const todayTasks = useMemo(() => 
     tasks.filter(t => t.dueDate <= addDays(today, 1) && t.status !== 'completed')
@@ -109,5 +158,8 @@ export function useDashboardData() {
     weekTasks,
     totalEstimatedTime,
     addTask,
+    loading,
+    refetchTasks: fetchTasks,
+    refetchCourses: fetchCourses,
   };
 }

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ChevronLeft, ChevronRight, Clock, BookOpen, Plus } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Clock, BookOpen, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -40,7 +40,7 @@ const Calendar = () => {
   const navigate = useNavigate();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
-  const { tasks, addTask } = useDashboardData();
+  const { tasks, addTask, loading } = useDashboardData();
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -69,6 +69,21 @@ const Calendar = () => {
     low: 'bg-accent',
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading calendar...</p>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -77,23 +92,23 @@ const Calendar = () => {
         animate={{ opacity: 1, y: 0 }}
         className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-xl"
       >
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center">
+        <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex h-14 sm:h-16 items-center">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate('/')}
-              className="mr-4"
+              className="mr-2 sm:mr-4 h-8 w-8 sm:h-10 sm:w-10"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
-            <h1 className="font-display text-xl font-semibold">Calendar</h1>
+            <h1 className="font-display text-lg sm:text-xl font-semibold">Calendar</h1>
           </div>
         </div>
       </motion.header>
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <main className="container mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Calendar Grid */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -101,14 +116,15 @@ const Calendar = () => {
             className="lg:col-span-2"
           >
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="font-display text-2xl">
+              <CardHeader className="flex flex-row items-center justify-between px-3 sm:px-6">
+                <CardTitle className="font-display text-lg sm:text-2xl">
                   {format(currentMonth, 'MMMM yyyy')}
                 </CardTitle>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <Button
                     variant="outline"
                     size="icon"
+                    className="h-8 w-8 sm:h-10 sm:w-10"
                     onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -116,6 +132,7 @@ const Calendar = () => {
                   <Button
                     variant="outline"
                     size="sm"
+                    className="h-8 sm:h-10 px-2 sm:px-4 text-xs sm:text-sm"
                     onClick={() => setCurrentMonth(new Date())}
                   >
                     Today
@@ -123,18 +140,20 @@ const Calendar = () => {
                   <Button
                     variant="outline"
                     size="icon"
+                    className="h-8 w-8 sm:h-10 sm:w-10"
                     onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-2 sm:px-6">
                 {/* Weekday Headers */}
-                <div className="grid grid-cols-7 mb-2">
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
-                      {day}
+                <div className="grid grid-cols-7 mb-1 sm:mb-2">
+                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+                    <div key={i} className="text-center text-xs sm:text-sm font-medium text-muted-foreground py-1 sm:py-2">
+                      <span className="sm:hidden">{day}</span>
+                      <span className="hidden sm:inline">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i]}</span>
                     </div>
                   ))}
                 </div>
@@ -144,7 +163,7 @@ const Calendar = () => {
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  className="grid grid-cols-7 gap-1"
+                  className="grid grid-cols-7 gap-0.5 sm:gap-1"
                 >
                   {calendarDays.map((day, index) => {
                     const dayTasks = getTasksForDate(day);
@@ -160,7 +179,7 @@ const Calendar = () => {
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setSelectedDate(day)}
                         className={cn(
-                          "relative aspect-square p-2 rounded-xl transition-colors text-left flex flex-col",
+                          "relative aspect-square p-1 sm:p-2 rounded-lg sm:rounded-xl transition-colors text-left flex flex-col",
                           !isCurrentMonth && "opacity-40",
                           isSelected && "bg-primary text-primary-foreground shadow-lg",
                           !isSelected && isCurrentDay && "bg-primary/10 border-2 border-primary",
@@ -168,7 +187,7 @@ const Calendar = () => {
                         )}
                       >
                         <span className={cn(
-                          "text-sm font-medium",
+                          "text-xs sm:text-sm font-medium",
                           isSelected && "text-primary-foreground"
                         )}>
                           {format(day, 'd')}

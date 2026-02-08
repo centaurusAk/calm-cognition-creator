@@ -14,7 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      courses: {
+        Row: {
+          code: string
+          color: string
+          created_at: string
+          id: string
+          name: string
+          progress: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          code: string
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          progress?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          code?: string
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          progress?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          course: string
+          created_at: string
+          due_date: string
+          estimated_time: number
+          id: string
+          priority: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          course: string
+          created_at?: string
+          due_date: string
+          estimated_time?: number
+          id?: string
+          priority?: string
+          status?: string
+          title: string
+          type?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          course?: string
+          created_at?: string
+          due_date?: string
+          estimated_time?: number
+          id?: string
+          priority?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

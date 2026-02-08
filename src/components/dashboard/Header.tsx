@@ -34,41 +34,41 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
           : 'bg-background/80 border-border'
       )}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex h-14 sm:h-16 items-center justify-between gap-2">
           {/* Left section - Greeting */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 500, damping: 30 }}
               className={cn(
-                'flex h-10 w-10 items-center justify-center rounded-xl',
+                'flex h-8 w-8 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl',
                 focusMode 
                   ? 'bg-primary/20 text-primary' 
                   : 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground'
               )}
             >
-              <Sparkles className="h-5 w-5" />
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />
             </motion.div>
-            <div>
+            <div className="min-w-0">
               <h1 className={cn(
-                'font-display text-xl font-semibold',
+                'font-display text-base sm:text-xl font-semibold truncate',
                 focusMode ? 'text-focus-foreground' : 'text-foreground'
               )}>
                 {greeting}
               </h1>
               <p className={cn(
-                'text-sm',
+                'text-xs sm:text-sm truncate',
                 focusMode ? 'text-focus-foreground/60' : 'text-muted-foreground'
               )}>
-                {format(now, 'EEEE, MMMM d')}
+                {format(now, 'EEE, MMM d')}
               </p>
             </div>
           </div>
 
           {/* Right section - Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {!focusMode && (
               <>
                 <motion.div
@@ -80,12 +80,12 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
                     variant="ghost"
                     size="icon"
                     onClick={onToggleDarkMode}
-                    className="relative"
+                    className="relative h-8 w-8 sm:h-10 sm:w-10"
                   >
                     {isDarkMode ? (
-                      <Sun className="h-5 w-5" />
+                      <Sun className="h-4 w-4 sm:h-5 sm:w-5" />
                     ) : (
-                      <Moon className="h-5 w-5" />
+                      <Moon className="h-4 w-4 sm:h-5 sm:w-5" />
                     )}
                   </Button>
                 </motion.div>
@@ -95,9 +95,9 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <Button variant="ghost" size="icon" className="relative">
-                    <Bell className="h-5 w-5" />
-                    <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-critical" />
+                  <Button variant="ghost" size="icon" className="relative h-8 w-8 sm:h-10 sm:w-10">
+                    <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-critical" />
                   </Button>
                 </motion.div>
 
@@ -105,9 +105,10 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 }}
+                  className="hidden sm:block"
                 >
-                  <Button variant="ghost" size="icon">
-                    <Settings className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
+                    <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
                   </Button>
                 </motion.div>
 
@@ -115,13 +116,13 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.5, type: 'spring' }}
-                  className="ml-2"
+                  className="ml-1 sm:ml-2"
                 >
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => navigate('/profile')}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground font-medium text-sm cursor-pointer"
+                    className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground font-medium text-xs sm:text-sm cursor-pointer"
                   >
                     A
                   </motion.button>
