@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Calendar, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Task } from '@/types/dashboard';
 import { format, addDays, startOfDay, isSameDay } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -9,6 +10,7 @@ interface WeekViewProps {
 }
 
 export function WeekView({ tasks }: WeekViewProps) {
+  const navigate = useNavigate();
   const today = startOfDay(new Date());
   const days = Array.from({ length: 7 }, (_, i) => addDays(today, i));
 
@@ -48,6 +50,7 @@ export function WeekView({ tasks }: WeekViewProps) {
         </div>
         <motion.button
           whileHover={{ x: 3 }}
+          onClick={() => navigate('/calendar')}
           className="flex items-center gap-1 text-sm text-primary hover:text-primary/80 transition-colors"
         >
           View calendar

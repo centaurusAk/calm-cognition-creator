@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 const Index = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { focusMode, session, startFocus, pauseFocus, resumeFocus, endFocus } = useFocusMode();
-  const { todayTasks, weekTasks, courses, totalEstimatedTime } = useDashboardData();
+  const { todayTasks, weekTasks, courses, totalEstimatedTime, addTask } = useDashboardData();
 
   useEffect(() => {
     if (isDarkMode) {
@@ -74,7 +74,8 @@ const Index = () => {
                 <div className="lg:col-span-2 space-y-6">
                   <TodayWidget 
                     tasks={todayTasks} 
-                    totalTime={totalEstimatedTime} 
+                    totalTime={totalEstimatedTime}
+                    onTaskAdd={addTask}
                   />
                   <WeekView tasks={weekTasks} />
                 </div>
