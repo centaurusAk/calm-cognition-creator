@@ -1,44 +1,66 @@
 import { motion } from 'framer-motion';
-import { CheckCircle2, Clock, Flame, Trophy } from 'lucide-react';
+import { CheckCircle2, Clock, AlertTriangle, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface QuickStatsProps {
   focusMode: boolean;
+  completedTasksCount: number;
+  totalEstimatedMinutes: number;
+  highPriorityCount: number;
+  avgCourseProgress: number;
 }
 
-const stats = [
-  {
-    label: 'Tasks Done',
-    value: 12,
-    change: '+3 today',
-    icon: CheckCircle2,
-    color: 'from-emerald-500 to-teal-600',
-  },
-  {
-    label: 'Study Hours',
-    value: '4.5h',
-    change: 'This week',
-    icon: Clock,
-    color: 'from-blue-500 to-indigo-600',
-  },
-  {
-    label: 'Day Streak',
-    value: 7,
-    change: 'Keep it up!',
-    icon: Flame,
-    color: 'from-orange-500 to-red-500',
-  },
-  {
-    label: 'Focus Score',
-    value: '85%',
-    change: '+5% vs last week',
-    icon: Trophy,
-    color: 'from-amber-500 to-yellow-500',
-  },
-];
-
-export function QuickStats({ focusMode }: QuickStatsProps) {
+export function QuickStats({
+  focusMode,
+  completedTasksCount,
+  totalEstimatedMinutes,
+  highPriorityCount,
+  avgCourseProgress,
+}: QuickStatsProps) {
   if (focusMode) return null;
+
+  const studyHours = totalEstimatedMinutes / 60;
+  const studyLabel =
+    studyHours < 1
+      ? `${totalEstimatedMinutes}m`
+      : studyHours % 1 === 0
+        ? `${studyHours}h`
+        : `${studyHours.toFixed(1)}h`;
+
+  const stats = [
+    {
+      label: 'Tasks Done',
+      value: completedTasksCount,
+      change: 'Total completed',
+      icon: CheckCircle2,
+      iconColor: 'bg-gradient-to-br from-accent to-accent/80 text-accent-foreground',
+      bgColor: 'bg-accent/10',
+    },
+    {
+      label: 'Today\'s Load',
+      value: studyLabel,
+      change: 'Estimated study time',
+      icon: Clock,
+      iconColor: 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground',
+      bgColor: 'bg-primary/10',
+    },
+    {
+      label: 'High Priority',
+      value: highPriorityCount,
+      change: 'Tasks needing attention',
+      icon: AlertTriangle,
+      iconColor: 'bg-gradient-to-br from-urgency to-critical text-white',
+      bgColor: 'bg-urgency/10',
+    },
+    {
+      label: 'Avg Progress',
+      value: `${avgCourseProgress}%`,
+      change: 'Across all courses',
+      icon: TrendingUp,
+      iconColor: 'bg-gradient-to-br from-urgency to-urgency/80 text-white',
+      bgColor: 'bg-urgency/10',
+    },
+  ];
 
   return (
     <motion.div
@@ -56,26 +78,26 @@ export function QuickStats({ focusMode }: QuickStatsProps) {
           whileHover={{ y: -4, transition: { duration: 0.2 } }}
           className="relative overflow-hidden rounded-xl sm:rounded-2xl bg-card p-3 sm:p-4 shadow-md border border-border/50"
         >
-          {/* Gradient Background */}
+          {/* Tinted background glow */}
           <div className={cn(
-            'absolute top-0 right-0 h-16 w-16 sm:h-20 sm:w-20 opacity-10 blur-2xl',
-            `bg-gradient-to-br ${stat.color}`
+            'absolute top-0 right-0 h-16 w-16 sm:h-20 sm:w-20 opacity-40 blur-2xl',
+            stat.bgColor
           )} />
-          
+
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-2 sm:mb-3">
               <motion.div
                 whileHover={{ rotate: 10, scale: 1.1 }}
                 className={cn(
-                  'flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-br text-white',
-                  stat.color
+                  'flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl',
+                  stat.iconColor
                 )}
               >
                 <stat.icon className="h-4 w-4 sm:h-5 sm:w-5" />
               </motion.div>
             </div>
-            
-            <motion.p 
+
+            <motion.p
               className="text-xl sm:text-2xl font-display font-bold text-foreground"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
