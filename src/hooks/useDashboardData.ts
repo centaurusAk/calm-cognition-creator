@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Task, Course } from '@/types/dashboard';
 import { addDays, startOfDay } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 const today = startOfDay(new Date());
 
@@ -10,7 +10,6 @@ export function useDashboardData() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   // Fetch tasks from Supabase
   const fetchTasks = useCallback(async () => {
@@ -36,13 +35,11 @@ export function useDashboardData() {
       setTasks(formattedTasks);
     } catch (error) {
       console.error('Error fetching tasks:', error);
-      toast({
-        title: 'Error loading tasks',
+      toast.error('Error loading tasks', {
         description: 'Could not fetch tasks from the database.',
-        variant: 'destructive',
       });
     }
-  }, [toast]);
+  }, []);
 
   // Fetch courses from Supabase
   const fetchCourses = useCallback(async () => {
@@ -65,13 +62,11 @@ export function useDashboardData() {
       setCourses(formattedCourses);
     } catch (error) {
       console.error('Error fetching courses:', error);
-      toast({
-        title: 'Error loading courses',
+      toast.error('Error loading courses', {
         description: 'Could not fetch courses from the database.',
-        variant: 'destructive',
       });
     }
-  }, [toast]);
+  }, []);
 
   // Initial data fetch
   useEffect(() => {
@@ -102,7 +97,6 @@ export function useDashboardData() {
 
       if (error) throw error;
 
-      // Update local state with the inserted task
       const insertedTask: Task = {
         id: data.id,
         title: data.title,
@@ -118,19 +112,16 @@ export function useDashboardData() {
         a.dueDate.getTime() - b.dueDate.getTime()
       ));
 
-      toast({
-        title: 'Task added',
+      toast.success('Task added', {
         description: `"${newTask.title}" has been added to your tasks.`,
       });
     } catch (error) {
       console.error('Error adding task:', error);
-      toast({
-        title: 'Error adding task',
+      toast.error('Error adding task', {
         description: 'Could not save the task to the database.',
-        variant: 'destructive',
       });
     }
-  }, [toast]);
+  }, []);
 
   // Update a task in Supabase
   const updateTask = useCallback(async (updatedTask: Task) => {
@@ -150,24 +141,20 @@ export function useDashboardData() {
 
       if (error) throw error;
 
-      // Update local state
       setTasks(prev => prev.map(t => 
         t.id === updatedTask.id ? updatedTask : t
       ).sort((a, b) => a.dueDate.getTime() - b.dueDate.getTime()));
 
-      toast({
-        title: 'Task updated',
+      toast.success('Task updated', {
         description: `"${updatedTask.title}" has been updated.`,
       });
     } catch (error) {
       console.error('Error updating task:', error);
-      toast({
-        title: 'Error updating task',
+      toast.error('Error updating task', {
         description: 'Could not update the task.',
-        variant: 'destructive',
       });
     }
-  }, [toast]);
+  }, []);
 
   // Delete a task from Supabase
   const deleteTask = useCallback(async (taskId: string) => {
@@ -179,22 +166,18 @@ export function useDashboardData() {
 
       if (error) throw error;
 
-      // Update local state
       setTasks(prev => prev.filter(t => t.id !== taskId));
 
-      toast({
-        title: 'Task deleted',
+      toast.success('Task deleted', {
         description: 'The task has been removed.',
       });
     } catch (error) {
       console.error('Error deleting task:', error);
-      toast({
-        title: 'Error deleting task',
+      toast.error('Error deleting task', {
         description: 'Could not delete the task.',
-        variant: 'destructive',
       });
     }
-  }, [toast]);
+  }, []);
 
   const todayTasks = useMemo(() => 
     tasks.filter(t => t.dueDate <= addDays(today, 1) && t.status !== 'completed')

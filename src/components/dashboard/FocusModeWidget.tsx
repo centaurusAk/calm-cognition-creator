@@ -79,7 +79,7 @@ export function FocusModeWidget({
                 'flex h-10 w-10 items-center justify-center rounded-xl shadow-lg',
                 focusMode 
                   ? 'bg-primary text-primary-foreground' 
-                  : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white'
+                  : 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground'
               )}
               animate={focusMode ? { scale: [1, 1.1, 1] } : {}}
               transition={{ duration: 2, repeat: Infinity }}
@@ -107,6 +107,7 @@ export function FocusModeWidget({
               initial={{ opacity: 0, scale: 0 }}
               animate={{ opacity: 1, scale: 1 }}
               onClick={onEnd}
+              aria-label="End focus session"
               className="p-2 rounded-lg hover:bg-white/10 transition-colors"
             >
               <X className="h-5 w-5" />
@@ -190,7 +191,12 @@ export function FocusModeWidget({
                 </svg>
                 
                 {/* Timer Display */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div
+                  role="timer"
+                  aria-live="polite"
+                  aria-label={`${formatTime(remaining)} remaining`}
+                  className="absolute inset-0 flex flex-col items-center justify-center"
+                >
                   <motion.span 
                     className="text-4xl font-display font-bold tabular-nums"
                     key={formatTime(remaining)}

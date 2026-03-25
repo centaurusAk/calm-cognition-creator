@@ -16,7 +16,18 @@ type WorkloadLevel = 'light' | 'moderate' | 'heavy';
 const Index = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { focusMode, session, startFocus, pauseFocus, resumeFocus, endFocus } = useFocusMode();
-  const { todayTasks, weekTasks, courses, totalEstimatedTime, addTask, updateTask, deleteTask, loading } = useDashboardData();
+  const { tasks, todayTasks, weekTasks, courses, totalEstimatedTime, addTask, updateTask, deleteTask, loading } = useDashboardData();
+
+  // Compute real stats from tasks and courses
+  const completedTasksCount = useMemo(() => tasks.filter(t => t.status === 'completed').length, [tasks]);
+  const highPriorityCount = useMemo(
+    () => tasks.filter(t => t.priority === 'high' && t.status !== 'completed').length,
+    [tasks]
+  );
+  const avgCourseProgress = useMemo(
+    () => courses.length > 0 ? Math.round(courses.reduce((acc, c) => acc + c.progress, 0) / courses.length) : 0,
+    [courses]
+  );
 
   // Calculate workload level based on estimated time
   const workloadLevel: WorkloadLevel = useMemo(() => {
@@ -121,12 +132,18 @@ const Index = () => {
               className="space-y-4 sm:space-y-8"
             >
               {/* Quick Stats Row */}
-              <QuickStats focusMode={focusMode} />
+              <QuickStats
+                focusMode={focusMode}
+                completedTasksCount={completedTasksCount}
+                totalEstimatedMinutes={totalEstimatedTime}
+                highPriorityCount={highPriorityCount}
+                avgCourseProgress={avgCourseProgress}
+              />
 
               {/* Main Content Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                 {/* Left Column - Today's Focus (Larger) */}
-                <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+                <div className="md:col-span-2 space-y-4 sm:space-y-6">
                   <TodayWidget 
                     tasks={todayTasks} 
                     totalTime={totalEstimatedTime}

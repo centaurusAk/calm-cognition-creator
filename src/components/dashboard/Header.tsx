@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { Bell, Settings, Sun, Moon, Sparkles } from 'lucide-react';
+import { Bell, Settings, Sun, Moon, Sparkles, LayoutDashboard, Calendar, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NavLink } from '@/components/NavLink';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +22,14 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
     : hour < 17 
       ? 'Good afternoon' 
       : 'Good evening';
+
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    cn(
+      'flex items-center gap-1.5 rounded-lg px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium transition-colors',
+      isActive
+        ? 'bg-primary/10 text-primary'
+        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+    );
 
   return (
     <motion.header
@@ -53,19 +62,37 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
             </motion.div>
             <div className="min-w-0">
               <h1 className={cn(
-                'font-display text-base sm:text-xl font-semibold truncate',
+                'font-display text-sm sm:text-xl font-semibold truncate',
                 focusMode ? 'text-focus-foreground' : 'text-foreground'
               )}>
                 {greeting}
               </h1>
               <p className={cn(
-                'text-xs sm:text-sm truncate',
+                'text-xs sm:text-sm truncate hidden sm:block',
                 focusMode ? 'text-focus-foreground/60' : 'text-muted-foreground'
               )}>
                 {format(now, 'EEE, MMM d')}
               </p>
             </div>
           </div>
+
+          {/* Centre navigation */}
+          {!focusMode && (
+            <nav aria-label="Main navigation" className="flex items-center gap-0.5 sm:gap-1">
+              <NavLink to="/" end className={navLinkClass}>
+                <LayoutDashboard className="h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">Dashboard</span>
+              </NavLink>
+              <NavLink to="/calendar" className={navLinkClass}>
+                <Calendar className="h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">Calendar</span>
+              </NavLink>
+              <NavLink to="/profile" className={navLinkClass}>
+                <User className="h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">Profile</span>
+              </NavLink>
+            </nav>
+          )}
 
           {/* Right section - Actions */}
           <div className="flex items-center gap-1 sm:gap-2 shrink-0">
@@ -80,6 +107,7 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
                     variant="ghost"
                     size="icon"
                     onClick={onToggleDarkMode}
+                    aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
                     className="relative h-8 w-8 sm:h-10 sm:w-10"
                   >
                     {isDarkMode ? (
@@ -95,9 +123,13 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <Button variant="ghost" size="icon" className="relative h-8 w-8 sm:h-10 sm:w-10">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Notifications"
+                    className="relative h-8 w-8 sm:h-10 sm:w-10"
+                  >
                     <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
-                    <span className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-critical" />
                   </Button>
                 </motion.div>
 
@@ -107,7 +139,12 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
                   transition={{ delay: 0.4 }}
                   className="hidden sm:block"
                 >
-                  <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Settings"
+                    className="h-8 w-8 sm:h-10 sm:w-10"
+                  >
                     <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
                   </Button>
                 </motion.div>
@@ -122,6 +159,7 @@ export function Header({ focusMode, onToggleDarkMode, isDarkMode }: HeaderProps)
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => navigate('/profile')}
+                    aria-label="Go to profile"
                     className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground font-medium text-xs sm:text-sm cursor-pointer"
                   >
                     A

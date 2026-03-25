@@ -5,6 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AddTaskDialog } from '@/components/dashboard/AddTaskDialog';
 import { EditTaskDialog } from '@/components/dashboard/EditTaskDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { useNavigate } from 'react-router-dom';
 import { useState, useMemo } from 'react';
 import { Task } from '@/types/dashboard';
@@ -23,6 +34,9 @@ import {
   isToday
 } from 'date-fns';
 import { useDashboardData } from '@/hooks/useDashboardData';
+
+const WEEKDAY_LABELS_SHORT = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const WEEKDAY_LABELS_LONG  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -57,7 +71,7 @@ const Calendar = () => {
       day = addDays(day, 1);
     }
     return days;
-  }, [currentMonth]);
+  }, [calendarStart, calendarEnd]);
 
   const getTasksForDate = (date: Date): Task[] => {
     return tasks.filter(task => isSameDay(task.dueDate, date));
@@ -100,6 +114,7 @@ const Calendar = () => {
               variant="ghost"
               size="icon"
               onClick={() => navigate('/')}
+              aria-label="Go back to dashboard"
               className="mr-2 sm:mr-4 h-8 w-8 sm:h-10 sm:w-10"
             >
               <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -127,6 +142,7 @@ const Calendar = () => {
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 sm:h-10 sm:w-10"
+                    aria-label="Previous month"
                     onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -143,6 +159,7 @@ const Calendar = () => {
                     variant="outline"
                     size="icon"
                     className="h-8 w-8 sm:h-10 sm:w-10"
+                    aria-label="Next month"
                     onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
                   >
                     <ChevronRight className="h-4 w-4" />
@@ -150,12 +167,17 @@ const Calendar = () => {
                 </div>
               </CardHeader>
               <CardContent className="px-2 sm:px-6">
-                {/* Weekday Headers */}
-                <div className="grid grid-cols-7 mb-1 sm:mb-2">
-                  {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                    <div key={i} className="text-center text-xs sm:text-sm font-medium text-muted-foreground py-1 sm:py-2">
-                      <span className="sm:hidden">{day}</span>
-                      <span className="hidden sm:inline">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][i]}</span>
+                {/* Weekday Headers — unique labels for all 7 days */}
+                <div className="grid grid-cols-7 mb-1 sm:mb-2" role="row">
+                  {WEEKDAY_LABELS_SHORT.map((short, i) => (
+                    <div
+                      key={WEEKDAY_LABELS_LONG[i]}
+                      role="columnheader"
+                      aria-label={WEEKDAY_LABELS_LONG[i]}
+                      className="text-center text-xs sm:text-sm font-medium text-muted-foreground py-1 sm:py-2"
+                    >
+                      <span className="sm:hidden">{short}</span>
+                      <span className="hidden sm:inline">{WEEKDAY_LABELS_LONG[i]}</span>
                     </div>
                   ))}
                 </div>
@@ -166,6 +188,8 @@ const Calendar = () => {
                   initial="hidden"
                   animate="visible"
                   className="grid grid-cols-7 gap-0.5 sm:gap-1"
+                  role="grid"
+                  aria-label={`Calendar for ${format(currentMonth, 'MMMM yyyy')}`}
                 >
                   {calendarDays.map((day, index) => {
                     const dayTasks = getTasksForDate(day);
@@ -180,6 +204,8 @@ const Calendar = () => {
                         whileHover={{ scale: 1.05, zIndex: 10 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setSelectedDate(day)}
+                        aria-selected={!!isSelected}
+                        aria-label={`${format(day, 'EEEE, MMMM d')}${dayTasks.length > 0 ? `, ${dayTasks.length} task${dayTasks.length > 1 ? 's' : ''}` : ''}`}
                         className={cn(
                           "relative aspect-square p-1 sm:p-2 rounded-lg sm:rounded-xl transition-colors text-left flex flex-col",
                           !isCurrentMonth && "opacity-40",
@@ -284,22 +310,46 @@ const Calendar = () => {
                               >
                                 {task.priority}
                               </Badge>
+                              {/* Edit — always visible on touch, hover-reveal on pointer devices */}
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setEditingTask(task)}
-                                className="h-7 w-7 text-muted-foreground/50 hover:text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all"
+                                aria-label={`Edit task: ${task.title}`}
+                                className="h-7 w-7 text-muted-foreground/70 hover:text-primary hover:bg-primary/10 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
                               >
                                 <Pencil className="h-3.5 w-3.5" />
                               </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => deleteTask(task.id)}
-                                className="h-7 w-7 text-muted-foreground/50 hover:text-critical hover:bg-critical/10 opacity-0 group-hover:opacity-100 transition-all"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </Button>
+                              {/* Delete with confirmation — always visible on touch */}
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    aria-label={`Delete task: ${task.title}`}
+                                    className="h-7 w-7 text-muted-foreground/70 hover:text-critical hover:bg-critical/10 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete task?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      <strong>"{task.title}"</strong> will be permanently removed. This cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => deleteTask(task.id)}
+                                      className="bg-critical text-critical-foreground hover:bg-critical/90"
+                                    >
+                                      Delete
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </div>
                           </div>
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">

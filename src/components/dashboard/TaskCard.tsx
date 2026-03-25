@@ -6,6 +6,17 @@ import { format, isToday, isTomorrow } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { EditTaskDialog } from './EditTaskDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const typeIcons = {
   quiz: BookOpen,
@@ -44,11 +55,6 @@ export function TaskCard({ task, index, compact = false, onDelete, onUpdate }: T
   };
 
   const isUrgent = task.priority === 'high' && isToday(task.dueDate);
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete?.(task.id);
-  };
 
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -153,28 +159,51 @@ export function TaskCard({ task, index, compact = false, onDelete, onUpdate }: T
             </motion.div>
           )}
 
-          {/* Edit button - visible on hover */}
+          {/* Edit button — always visible on touch screens, hover-reveal on pointer devices */}
           {onUpdate && (
             <Button
               variant="ghost"
               size="icon"
               onClick={handleEditClick}
-              className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground/50 hover:text-primary hover:bg-primary/10 opacity-0 group-hover:opacity-100 transition-all"
+              aria-label={`Edit task: ${task.title}`}
+              className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground/70 hover:text-primary hover:bg-primary/10 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
             >
               <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
           )}
 
-          {/* Delete button - visible on hover */}
+          {/* Delete button with confirmation — always visible on touch, hover-reveal on pointer devices */}
           {onDelete && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleDelete}
-              className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground/50 hover:text-critical hover:bg-critical/10 opacity-0 group-hover:opacity-100 transition-all"
-            >
-              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`Delete task: ${task.title}`}
+                  className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground/70 hover:text-critical hover:bg-critical/10 sm:opacity-0 sm:group-hover:opacity-100 transition-all"
+                >
+                  <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete task?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <strong>"{task.title}"</strong> will be permanently removed. This cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => onDelete(task.id)}
+                    className="bg-critical text-critical-foreground hover:bg-critical/90"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </div>
       </div>
